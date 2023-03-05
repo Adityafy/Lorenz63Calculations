@@ -1,1 +1,5 @@
-*asv
+*.asv
+*.mp4
+*.fig
+*.jpg
+*.png
