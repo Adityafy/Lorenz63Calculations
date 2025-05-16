@@ -40,9 +40,13 @@ for i = 1:length(dt)
     % foeerrorf1(i) = mean(abs(uexactf1-ufoef1(1:end-1)));
     % rk4errorf1(i) = mean(abs(uexactf1-urk4f1(1:end-1)));
 
-    etderrorf1(i) = mean(abs(uexactf1-uetdf1));
-    foeerrorf1(i) = mean(abs(uexactf1-ufoef1));
-    rk4errorf1(i) = mean(abs(uexactf1-urk4f1));
+    % etderrorf1(i) = mean(abs(uexactf1-uetdf1));
+    % foeerrorf1(i) = mean(abs(uexactf1-ufoef1));
+    % rk4errorf1(i) = mean(abs(uexactf1-urk4f1));
+
+    etderrorf1(i) = mean(abs((uexactf1-uetdf1)./uexactf1));
+    foeerrorf1(i) = mean(abs((uexactf1-ufoef1)./uexactf1));
+    rk4errorf1(i) = mean(abs((uexactf1-urk4f1)./uexactf1));
 
     %% du/dt = -u^3
     % f2 : function 2 : rhs of du/dt = -u^3
@@ -66,9 +70,13 @@ for i = 1:length(dt)
     % foeerrorf2(i) = mean(abs(uexactf2-ufoef2(1:end-1)));
     % rk4errorf2(i) = mean(abs(uexactf2-urk4f2(1:end-1)));
 
-    etderrorf2(i) = mean(abs(uexactf2-uetdf2));
-    foeerrorf2(i) = mean(abs(uexactf2-ufoef2));
-    rk4errorf2(i) = mean(abs(uexactf2-urk4f2));
+    % etderrorf2(i) = mean(abs(uexactf2-uetdf2));
+    % foeerrorf2(i) = mean(abs(uexactf2-ufoef2));
+    % rk4errorf2(i) = mean(abs(uexactf2-urk4f2));
+
+    etderrorf2(i) = mean(abs((uexactf2-uetdf2)./uexactf2));
+    foeerrorf2(i) = mean(abs((uexactf2-ufoef2)./uexactf2));
+    rk4errorf2(i) = mean(abs((uexactf2-urk4f2)./uexactf2));
 
     %% du/dt = u - u^3
     % f3 : function 3 : rhs of du/dt = u-u^3
@@ -95,9 +103,49 @@ for i = 1:length(dt)
     % foeerrorf3(i) = mean(abs(uexactf3-ufoef3(1:end-1)));
     % rk4errorf3(i) = mean(abs(uexactf3-urk4f3(1:end-1)));
 
-    etderrorf3(i) = mean(abs(uexactf3-uetdf3));
-    foeerrorf3(i) = mean(abs(uexactf3-ufoef3));
-    rk4errorf3(i) = mean(abs(uexactf3-urk4f3));
+    % etderrorf3(i) = mean(abs(uexactf3-uetdf3));
+    % foeerrorf3(i) = mean(abs(uexactf3-ufoef3));
+    % rk4errorf3(i) = mean(abs(uexactf3-urk4f3));
+
+    etderrorf3(i) = mean(abs((uexactf3-uetdf3)./uexactf3));
+    foeerrorf3(i) = mean(abs((uexactf3-ufoef3)./uexactf3));
+    rk4errorf3(i) = mean(abs((uexactf3-urk4f3)./uexactf3));
+
+
+        %% du/dt = cu + sin(t)
+    % f4 : function 4 : rhs of du/dt = cu + sin(t)
+    c = -100;
+    dynrhsf4 = @(p,u) c*u + sin(p.time);
+    
+    Lf4 = @(p) c;
+
+    Nf4 = @(p) sin(p.time);
+
+    % u = zeros(1,nmax);
+    u(1) = 0.2;
+    
+
+    for t = 1:nmax+1
+        uexactf4(t) = u(1)*exp(c*t)+(exp(c*t)-c*sin(t)-cos(t))/(1+c^2);
+    end
+    uetdf4 = etdrk4(p,u,Lf4,Nf4);
+    urk4f4 = rk4(p,u,dynrhsf4);
+    % uexactf3 = uexactf3fn(K,p,u);
+    ufoef4 = foedyn(p,u,dynrhsf4);
+
+    % errors
+    % etderrorf3(i) = mean(abs(uexactf3-uetdf3(1:end-1)));
+    % foeerrorf3(i) = mean(abs(uexactf3-ufoef3(1:end-1)));
+    % rk4errorf3(i) = mean(abs(uexactf3-urk4f3(1:end-1)));
+
+    % etderrorf3(i) = mean(abs(uexactf3-uetdf3));
+    % foeerrorf3(i) = mean(abs(uexactf3-ufoef3));
+    % rk4errorf3(i) = mean(abs(uexactf3-urk4f3));
+
+    etderrorf4(i) = mean(abs((uexactf4-uetdf4)./uexactf4));
+    foeerrorf4(i) = mean(abs((uexactf4-ufoef4)./uexactf4));
+    rk4errorf4(i) = mean(abs((uexactf4-urk4f4)./uexactf4));
+
 
 end
 %%
@@ -195,6 +243,29 @@ subtitle('Error convergence for du/dt = -u');
 set(gca,'TickLabelInterpreter','tex','FontSize',15);
 subtitle('Error convergence for du/dt = u - u^3');
 
+% %%
+% figure;
+% hold on;
+% plot(time,uetdf4,'-o','color','blue','DisplayName','u etdcm');
+% plot(time,urk4f4,'-s','color','red', 'DisplayName','u rk4');
+% plot(time,uexactf4,'color','black', 'DisplayName','u exact','LineWidth',2);
+% hold off;
+% title('du/dt = cu + sin(t)');
+% legend;
+% 
+% %%
+% figure;
+% plot(log10(dt),log10(etderrorf4),'-o','DisplayName','ETDRK4'); 
+% hold on;
+% plot(log10(dt),log10(foeerrorf4), '-s','DisplayName','First order Euler');
+% plot(log10(dt),log10(rk4errorf4), '-^','color', 'black','DisplayName','RK4');
+% hold off;
+% legend;
+% xlabel('$\log{(\Delta t)}$','Interpreter','latex');
+% ylabel('$\log{(E)}$','Interpreter','latex');
+% subtitle('Error convergence for du/dt = cu + sin(t)');
+% set(gca,'TickLabelInterpreter','tex','FontSize',15);
+% subtitle('Error convergence for du/dt = cu + sin(t)');
 
 %% RK4 function
 function u = rk4(p,u,rhs)
