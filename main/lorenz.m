@@ -1,7 +1,7 @@
 % Lorenz CLV calculations runscript
 close all;
 clear all;
-addpath('/Users/araj/Documents/Lorenz63Calculations/functions/');
+addpath('../functions/');
 
 %% parameters
 sigma = 10; r = 28; b = 8/3;
@@ -40,18 +40,20 @@ p = struct('sigma', sigma, 'r', r, 'b', b, 'nmax', nmax, 'dt', dt, 'm', m, ...
             'wnorm', wnorm, 'twnorm', twnorm,'timesteps_vec', timesteps_vec);
 
 tic
+tic
 %% space-time  dynamics calculation
 
-% u = stdynamics(p,u,@rk4dyn,@lorenz63rhs,@linLorenz63,@nonlinLorenz63);
-
-u = stdynamics(p,u,@etdCoxMatthewsRK4,@lorenz63rhs,@linLorenz63,@nonlinLorenz63);
-
+u = stdynamics(p,u,@rk4,@linLorenz63,@nonlinLorenz63);
+% u = stdynamics(p,u,@etdCoxMatthewsRK4,@linLorenz63,@nonlinLorenz63);
+% u = stdynamics(p,u,@etd1pc,@lorenz63rhs,@linLorenz63,@nonlinLorenz63);
 
 %% dynamics plot
 fig_attractor(u);
 
 %% gs
-[v,R,laminst,lamgs] = gs(p,u,@rk4ts,@lor63jacobian);
+% [v,R,laminst,lamgs] = gs(p,u,@rk4ts,@lor63jacobian);
+% [v,R,laminst,lamgs] = gs(p,u,@rk4,@lor63jacobian);
+[v,R,laminst,lamgs] = gs(p,u,@etdCoxMatthewsRK4,@lor63jacobian);
 
 %% laminst convergence fig
 fig_laminstave(laminst);
